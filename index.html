@@ -76,6 +76,8 @@
   .feat .fname{flex:1}
   .feat-link{cursor:pointer;background:none;border:0;padding:0;font:inherit;color:inherit;text-align:left}
   .feat-link:hover{color:var(--tomato);text-decoration:underline}
+  .prod-of{cursor:pointer;background:none;border:0;padding:0;font:inherit;font-size:12px;color:var(--tomato);margin-left:10px}
+  .prod-of:hover{text-decoration:underline}
   .feat .fid{font-size:11px;color:var(--muted);display:none}
   .product.show-ids .feat .fid{display:inline}
   .feat.retired .fname{color:var(--muted)}
@@ -173,6 +175,8 @@ const ALIASES={
 };
 
 let products=[]; // {name, sku, guid, headline, feats:[{name, id, retired}]}
+let prodByNorm=new Map(); // normalized product name -> product (for feature->product drill-in)
+const norm=s=>s.trim().toLowerCase().replace(/\s+/g,' ');
 
 fetch('./data.csv').then(r=>{
   if(!r.ok) throw new Error(r.status);
@@ -202,6 +206,7 @@ fetch('./data.csv').then(r=>{
     p.headline=isHeadline(p.name);
     return p;
   }).sort((a,b)=>a.name.localeCompare(b.name));
+  prodByNorm=new Map(products.map(p=>[norm(p.name),p]));
   render();
 }).catch(e=>{
   document.getElementById('list').innerHTML=
@@ -222,17 +227,18 @@ $vF.addEventListener('click',()=>{view='features';$vF.classList.add('active');$v
 function esc(s){return s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
 function escA(s){return esc(s).replace(/"/g,'&quot;');}
 
-// cross-links: feature -> all products with it, and product -> that product
+// cross-links: feature -> all products with it; product-name link / drill -> that product
 $list.addEventListener('click',e=>{
-  const b=e.target.closest('.feat-link'); if(!b)return;
-  $q.value=b.dataset.name;
-  if(b.classList.contains('prod-link')){
+  const pl=e.target.closest('.prod-link,.prod-of');  // -> open a product
+  const fl=pl?null:e.target.closest('.feat-link');   // -> show products with a feature
+  if(!pl&&!fl)return;
+  if(pl){
     view='products';$vP.classList.add('active');$vF.classList.remove('active');
-    $q.placeholder='Search products, features, or paste a GUID';
-    jumpProduct=b.dataset.name; renderProducts();
+    $q.value=pl.dataset.name; $q.placeholder='Search products, features, or paste a GUID';
+    jumpProduct=pl.dataset.name; renderProducts();
   } else {
     view='features';$vF.classList.add('active');$vP.classList.remove('active');
-    $q.placeholder='Search features, or paste a service plan GUID';
+    $q.value=fl.dataset.name; $q.placeholder='Search features, or paste a service plan GUID';
     renderFeatures();
   }
   const open=$list.querySelector('.product.open'); if(open)open.scrollIntoView({block:'start'});
@@ -325,11 +331,13 @@ function renderProducts(){
     // when searching by feature, show only matching feats and auto-open
     const feats = (!m.empty && !pMatch) ? matchFeats : p.feats;
     const open = (p.name===jumpProduct) || (!m.empty && (matchFeats.length>0 || (!pMatch)));
-    const featHtml = feats.map(f=>
-      `<div class="feat${f.retired?' retired':''}">
-        <span class="fname"><button class="feat-link" data-name="${escA(f.name)}" title="Show all products with this feature">${hl(f.name,m)}</button>${f.retired?' <span class="tag">retired</span>':''}</span>
+    const featHtml = feats.map(f=>{
+      const sub=prodByNorm.get(norm(f.name));               // feature that is also a product...
+      const drill=(sub && sub.feats.length>1 && sub.name!==p.name) ? sub.name : null; // ...with its own plans
+      return `<div class="feat${f.retired?' retired':''}">
+        <span class="fname"><button class="feat-link" data-name="${escA(f.name)}" title="Show all products with this feature">${hl(f.name,m)}</button>${f.retired?' <span class="tag">retired</span>':''}${drill?` <button class="prod-of" data-name="${escA(drill)}" title="Open this as a product and see its plans">is a product &rsaquo;</button>`:''}</span>
         <span class="fid">${esc(f.id)}</span>
-      </div>`).join('');
+      </div>`;}).join('');
     return `<div class="product${open?' open':''}${showIds?' show-ids':''}">
       <button class="phead" aria-expanded="${open}">
         <svg class="chev"><use href="#chev"/></svg>
