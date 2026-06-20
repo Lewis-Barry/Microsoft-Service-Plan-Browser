@@ -1,0 +1,48 @@
+name: Refresh licensing CSV
+
+on:
+  schedule:
+    - cron: "0 6 * * 1"   # Mondays 06:00 UTC
+  workflow_dispatch: {}    # allow manual runs
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Find and download the CSV from the Learn page
+        run: |
+          set -euo pipefail
+          PAGE="https://learn.microsoft.com/en-us/entra/identity/users/licensing-service-plan-reference"
+          # Scrape whatever CSV link the page currently points at (the download
+          # path changes over time, the page link is the stable reference).
+          URL=$(curl -sL "$PAGE" | grep -oiE 'https://[^"]*\.csv' | head -1)
+          if [ -z "$URL" ]; then
+            echo "No CSV link found on $PAGE" >&2
+            exit 1
+          fi
+          echo "Found: $URL"
+          curl -sL "$URL" -o data.new.csv
+          # Sanity check: real file, has the header we expect.
+          head -1 data.new.csv | grep -q "Product_Display_Name" || {
+            echo "Downloaded file does not look like the licensing CSV" >&2
+            exit 1
+          }
+          mv data.new.csv data.csv
+
+      - name: Commit if changed
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- data.csv; then
+            echo "No change."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data.csv
+          git commit -m "Refresh licensing CSV $(date -u +%Y-%m-%d)"
+          git push

@@ -1,0 +1,341 @@
+<title>Microsoft 365 Plans and Features Map</title>
+<style>
+  :root{
+    --tomato:#f06543;        /* primary accent */
+    --sandy:#f09d51;         /* secondary accent */
+    --platinum:#e8e9eb;      /* surface */
+    --linen:#e0dfd5;         /* page */
+    --gunmetal:#313638;      /* text */
+    --muted:#7d8285;         /* retired / inactive tone */
+    --line:#c9cac4;          /* dividers */
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+    background:var(--linen);color:var(--gunmetal);line-height:1.45;
+  }
+  header{
+    background:var(--gunmetal);color:var(--platinum);
+    padding:20px 24px;border-bottom:4px solid var(--tomato);
+    display:flex;justify-content:space-between;align-items:flex-start;gap:16px;
+  }
+  .help-btn{font:inherit;font-size:13px;padding:8px 16px;cursor:pointer;flex:none;
+    background:transparent;color:var(--platinum);border:1px solid var(--platinum)}
+  .help-btn:hover{background:var(--tomato);border-color:var(--tomato);color:#fff}
+  dialog{border:0;padding:0;max-width:780px;width:92%;background:var(--platinum);
+    color:var(--gunmetal);border-top:4px solid var(--tomato);
+    margin:5vh auto;max-height:90vh;overflow:auto}
+  dialog::backdrop{background:rgba(49,54,56,.55)}
+  .modal{padding:26px;position:relative}
+  .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+  .modal .close{background:transparent;border:0;cursor:pointer;padding:0;line-height:0;flex:none}
+  .modal .close svg{width:18px;height:18px;fill:var(--gunmetal)}
+  .modal .close:hover svg{fill:var(--tomato)}
+  .modal h2{margin:0;font-size:18px}
+  .modal h3{margin:20px 0 6px;font-size:14px;font-weight:600}
+  .modal p{margin:0 0 8px;font-size:14px}
+  .modal code{background:#fff;border:1px solid var(--line);padding:1px 5px;font-size:13px}
+  header h1{margin:0 0 4px;font-size:20px;font-weight:600;letter-spacing:.2px}
+  header p{margin:0;font-size:13px;color:var(--linen)}
+  .controls{
+    position:sticky;top:0;z-index:5;background:var(--platinum);
+    border-bottom:1px solid var(--line);
+    padding:14px 24px;display:flex;gap:20px;align-items:center;flex-wrap:wrap;
+  }
+  .search{display:flex;align-items:center;gap:8px;background:#fff;
+    border:1px solid var(--line);padding:8px 10px;flex:1;min-width:260px}
+  .search svg{width:15px;height:15px;fill:var(--tomato);flex:none}
+  .search input{border:0;outline:0;font-size:14px;width:100%;background:transparent;color:var(--gunmetal)}
+  .toggle{display:flex;align-items:center;gap:7px;font-size:13px;cursor:pointer;user-select:none}
+  .toggle input{accent-color:var(--tomato);width:15px;height:15px}
+  .count{font-size:13px;color:var(--gunmetal);white-space:nowrap}
+  .seg{display:flex;border:1px solid var(--gunmetal)}
+  .seg button{font:inherit;font-size:13px;padding:7px 14px;border:0;background:#fff;color:var(--gunmetal);cursor:pointer;border-right:1px solid var(--gunmetal)}
+  .seg button:last-child{border-right:0}
+  .seg button.active{background:var(--gunmetal);color:var(--platinum)}
+  main{padding:8px 24px 60px;max-width:1000px}
+
+  .product{border-bottom:1px solid var(--line);background:transparent}
+  .phead{display:flex;align-items:center;gap:12px;padding:13px 6px;cursor:pointer;width:100%;text-align:left;border:0;background:transparent;font:inherit;color:inherit}
+  .phead:hover{background:var(--platinum)}
+  .chev{width:12px;height:12px;fill:var(--tomato);flex:none;transition:transform .15s ease}
+  .product.open .chev{transform:rotate(90deg)}
+  .pname{font-size:15px;font-weight:600;flex:1}
+  .pmeta{font-size:12px;color:var(--muted);display:none}
+  .product.show-ids .pmeta{display:block}
+  .pfeatcount{font-size:13px;color:var(--gunmetal);white-space:nowrap}
+  .pfeatcount b{color:var(--tomato);font-weight:600}
+
+  .features{display:none;padding:4px 6px 16px 30px}
+  .product.open .features{display:block}
+  .feat{display:flex;align-items:baseline;gap:10px;padding:4px 0;font-size:13px;border-left:2px solid var(--line);padding-left:14px;margin-left:2px}
+  .feat .fname{flex:1}
+  .feat-link{cursor:pointer;background:none;border:0;padding:0;font:inherit;color:inherit;text-align:left}
+  .feat-link:hover{color:var(--tomato);text-decoration:underline}
+  .feat .fid{font-size:11px;color:var(--muted);display:none}
+  .product.show-ids .feat .fid{display:inline}
+  .feat.retired .fname{color:var(--muted)}
+  .feat.retired .tag{color:var(--sandy);font-size:11px;font-weight:600;letter-spacing:.3px}
+  mark{background:var(--sandy);color:var(--gunmetal);padding:0 1px}
+  .empty{padding:40px 6px;color:var(--muted);font-size:14px}
+</style>
+
+<header>
+  <div>
+    <h1>Microsoft 365 Plans and Features Map</h1>
+    <p>Top-level products and the service plans they include. Source: Microsoft licensing service plan reference.</p>
+  </div>
+  <button class="help-btn" id="helpBtn">Help</button>
+</header>
+
+<dialog id="help">
+  <div class="modal">
+    <div class="modal-head">
+      <h2>How to use this map</h2>
+      <form method="dialog"><button class="close" aria-label="Close">
+        <svg viewBox="0 0 384 512"><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg>
+      </button></form>
+    </div>
+    <h3>Products and features</h3>
+    <p>A <b>product</b> is a purchasable licence, such as Microsoft 365 Business Standard or E5.</p>
+    <p>A <b>feature</b> (service plan) is a capability bundled inside products, such as Exchange Online or Microsoft Teams.</p>
+    <p>Use <b>By product</b> to see what a licence includes. Use <b>By feature</b> to see which licences include a capability. Click any item to cross over to the other view.</p>
+    <h3>Searching</h3>
+    <p>Typing matches any part of a name by default. Search runs across product names, feature names, SKU codes, and GUIDs.</p>
+    <p><code>"exact phrase"</code> matches the whole name only.</p>
+    <p><code>*</code> matches any run of characters, for example <code>defender*endpoint</code>.</p>
+    <p><code>?</code> matches a single character.</p>
+    <h3>Toggles</h3>
+    <p><b>Show all products</b> reveals every SKU, including add-ons. <b>Show SKU codes and GUIDs</b> displays the underlying identifiers.</p>
+  </div>
+</dialog>
+
+<div class="controls">
+  <div class="seg">
+    <button id="viewP" class="active">By product</button>
+    <button id="viewF">By feature</button>
+  </div>
+  <label class="search">
+    <svg viewBox="0 0 512 512"><path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"/></svg>
+    <input id="q" type="search" placeholder="Search products, features, or paste a GUID" autocomplete="off">
+  </label>
+  <label class="toggle"><input type="checkbox" id="showAll"> Show all products</label>
+  <label class="toggle"><input type="checkbox" id="showIds"> Show SKU codes and GUIDs</label>
+  <span class="count" id="count"></span>
+</div>
+
+<main id="list"><div class="empty">Loading data...</div></main>
+
+<svg style="display:none"><symbol id="chev" viewBox="0 0 320 512"><path d="M310.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L242.7 256 73.4 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z"/></symbol></svg>
+
+<script>
+// ----- minimal RFC4180-ish CSV parser (handles quoted commas + newlines) -----
+function parseCSV(text){
+  const rows=[];let row=[],field='',q=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i];
+    if(q){
+      if(c==='"'){ if(text[i+1]==='"'){field+='"';i++;} else q=false; }
+      else field+=c;
+    } else {
+      if(c==='"')q=true;
+      else if(c===','){row.push(field);field='';}
+      else if(c==='\n'){row.push(field);rows.push(row);row=[];field='';}
+      else if(c==='\r'){}
+      else field+=c;
+    }
+  }
+  if(field.length||row.length){row.push(field);rows.push(row);}
+  return rows;
+}
+
+// ponytail: default "headline SKU" filter is a display-name heuristic, not a curated
+// list. Ceiling: it may miss-include/exclude oddballs. Refine the EXCLUDE/INCLUDE
+// regexes below after eyeballing the default view; "Show all products" bypasses it.
+const INCLUDE=/^(Microsoft 365|Office 365|Enterprise Mobility|Microsoft Teams Enterprise|Windows (10|11) Enterprise)\b/i;
+const EXCLUDE=/\b(GCC|GOV|DOD|USGOV|faculty|student|Developer|Dev\b|Trial|Add[\s-]?on|VDA|Windows 365|Voice|vCPU|Attach|GCCHIGH|for Government)\b/i;
+function isHeadline(name){ return INCLUDE.test(name) && !EXCLUDE.test(name); }
+
+// Display-name overrides, keyed by Service_Plan_Id GUID. Microsoft's friendly
+// names sometimes lag the names used on sales pages. Add an entry to relabel a
+// plan in both views and in search. See adminguide.md for how to maintain this.
+const ALIASES={
+  "871d91ec-ec1a-452b-a83f-bd76c7d770ef":"Microsoft Defender for Endpoint (Plan 2)", // WINDEFATP
+};
+
+let products=[]; // {name, sku, guid, headline, feats:[{name, id, retired}]}
+
+fetch('./data.csv').then(r=>{
+  if(!r.ok) throw new Error(r.status);
+  return r.text();
+}).then(text=>{
+  const rows=parseCSV(text);
+  const head=rows[0].map(h=>h.trim());
+  const ix=n=>head.indexOf(n);
+  const P=ix('Product_Display_Name'),S=ix('String_Id'),G=ix('GUID'),
+        FN=ix('Service_Plans_Included_Friendly_Names'),FID=ix('Service_Plan_Id');
+  const map=new Map();
+  for(let i=1;i<rows.length;i++){
+    const r=rows[i];if(!r[P])continue;
+    let p=map.get(r[P]);
+    if(!p){p={name:r[P],sku:r[S],guid:r[G],feats:[],seen:new Set()};map.set(r[P],p);}
+    if(p.seen.has(r[FID]))continue; p.seen.add(r[FID]);
+    let fn=(r[FN]||r[ix('Service_Plan_Name')]||'').trim();
+    const retired=/^RETIRED\b/i.test(fn);
+    fn=fn.replace(/^RETIRED\s*-\s*/i,'');
+    // strip a trailing "(guid)" if present in the friendly name
+    fn=fn.replace(/\s*\([0-9a-f-]{36}\)\s*$/i,'').trim();
+    if(ALIASES[r[FID]]) fn=ALIASES[r[FID]];
+    p.feats.push({name:fn,id:r[FID],retired});
+  }
+  products=[...map.values()].map(p=>{
+    p.feats.sort((a,b)=>a.name.localeCompare(b.name));
+    p.headline=isHeadline(p.name);
+    return p;
+  }).sort((a,b)=>a.name.localeCompare(b.name));
+  render();
+}).catch(e=>{
+  document.getElementById('list').innerHTML=
+    '<div class="empty">Could not load data.csv ('+e.message+'). Serve this folder over http (e.g. <code>python3 -m http.server</code>) rather than opening the file directly.</div>';
+});
+
+const $q=document.getElementById('q'),$all=document.getElementById('showAll'),
+      $ids=document.getElementById('showIds'),$count=document.getElementById('count'),
+      $list=document.getElementById('list'),$vP=document.getElementById('viewP'),$vF=document.getElementById('viewF');
+let view='products', jumpProduct=null;
+const help=document.getElementById('help');
+document.getElementById('helpBtn').addEventListener('click',()=>help.showModal());
+help.addEventListener('click',e=>{ if(e.target===help) help.close(); }); // click backdrop to close
+[$q,$all,$ids].forEach(el=>el.addEventListener('input',render));
+$vP.addEventListener('click',()=>{view='products';$vP.classList.add('active');$vF.classList.remove('active');$q.placeholder='Search products, features, or paste a GUID';render();});
+$vF.addEventListener('click',()=>{view='features';$vF.classList.add('active');$vP.classList.remove('active');$q.placeholder='Search features, or paste a service plan GUID';render();});
+
+function esc(s){return s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+function escA(s){return esc(s).replace(/"/g,'&quot;');}
+
+// cross-links: feature -> all products with it, and product -> that product
+$list.addEventListener('click',e=>{
+  const b=e.target.closest('.feat-link'); if(!b)return;
+  $q.value=b.dataset.name;
+  if(b.classList.contains('prod-link')){
+    view='products';$vP.classList.add('active');$vF.classList.remove('active');
+    $q.placeholder='Search products, features, or paste a GUID';
+    jumpProduct=b.dataset.name; renderProducts();
+  } else {
+    view='features';$vF.classList.add('active');$vP.classList.remove('active');
+    $q.placeholder='Search features, or paste a service plan GUID';
+    renderFeatures();
+  }
+  const open=$list.querySelector('.product.open'); if(open)open.scrollIntoView({block:'start'});
+});
+// Compile the query box into a matcher.
+//   "exact phrase"  -> whole-string match (case-insensitive)
+//   foo*bar / f?o    -> * = any run, ? = one char
+//   anything else    -> plain substring
+function compile(raw){
+  raw=(raw||'').trim();
+  if(!raw || /^[*?]+$/.test(raw)) return {empty:true,test:()=>true};  // bare wildcards match nothing useful
+  let exact=false;
+  if(raw.length>=2 && raw[0]==='"' && raw.endsWith('"')){ raw=raw.slice(1,-1); exact=true; }
+  if(!exact && !/[*?]/.test(raw)){
+    const t=raw.toLowerCase();
+    return {plain:t,test:s=>s.toLowerCase().includes(t)};
+  }
+  let pat=raw.replace(/[.+^${}()|[\]\\]/g,'\\$&').replace(/\*/g,'.*').replace(/\?/g,'.');
+  if(exact) pat='^'+pat+'$';
+  let re; try{ re=new RegExp(pat,'i'); }catch(_){ const t=raw.toLowerCase(); return {plain:t,test:s=>s.toLowerCase().includes(t)}; }
+  return {re,test:s=>re.test(s)};
+}
+console.assert(compile('teams').test('Microsoft Teams'),'substring');
+console.assert(!compile('"teams"').test('Microsoft Teams'),'exact should not match substring');
+console.assert(compile('"Microsoft Teams"').test('Microsoft Teams'),'exact');
+console.assert(compile('defender*endpoint').test('Microsoft Defender for Endpoint'),'glob *');
+console.assert(compile('plan ?').test('Exchange Online (Plan 2)'),'glob ?');
+
+function hl(s,m){
+  if(!m||m.empty) return esc(s);
+  let i=-1,len=0;
+  if(m.plain!=null){ i=s.toLowerCase().indexOf(m.plain); len=m.plain.length; }
+  else if(m.re){ const mm=s.match(m.re); if(mm){ i=mm.index; len=mm[0].length; } }
+  if(i<0||len===0) return esc(s);
+  return esc(s.slice(0,i))+'<mark>'+esc(s.slice(i,i+len))+'</mark>'+esc(s.slice(i+len));
+}
+
+function render(){ view==='features'?renderFeatures():renderProducts(); }
+
+function renderFeatures(){
+  const m=compile($q.value), term=m.empty?'':$q.value.trim();
+  const showAll=$all.checked, showIds=$ids.checked;
+  const visible=products.filter(p=>showAll||p.headline);
+  // build feature -> products index, keyed by friendly name (MS reuses one name
+  // across several plan GUIDs; merge them and collect the distinct ids)
+  const map=new Map();
+  visible.forEach(p=>p.feats.forEach(f=>{
+    const k=f.name.toLowerCase();
+    let e=map.get(k);
+    if(!e){e={name:f.name,retired:f.retired,ids:new Set(),prods:new Set()};map.set(k,e);}
+    e.ids.add(f.id); e.prods.add(p.name); if(!f.retired)e.retired=false;
+  }));
+  const feats=[...map.values()].map(e=>({
+    name:e.name,retired:e.retired,id:[...e.ids].join(', '),prods:[...e.prods].sort()
+  })).sort((a,b)=>a.name.localeCompare(b.name));
+  let shown=0;
+  const html=feats.map(f=>{
+    const fMatch=m.empty||m.test(f.name)||m.test(f.id);
+    const matchProds=m.empty?[]:f.prods.filter(n=>m.test(n));
+    if(!m.empty&&!fMatch&&matchProds.length===0)return '';
+    shown++;
+    const prods=(!m.empty&&!fMatch)?matchProds:f.prods;
+    const open=!m.empty&&(matchProds.length>0||!fMatch);
+    const list=prods.map(n=>`<div class="feat"><span class="fname"><button class="feat-link prod-link" data-name="${escA(n)}" title="Show this product">${hl(n,m)}</button></span></div>`).join('');
+    return `<div class="product${open?' open':''}${showIds?' show-ids':''}">
+      <button class="phead" aria-expanded="${open}">
+        <svg class="chev"><use href="#chev"/></svg>
+        <span class="pname">${hl(f.name,m)}${f.retired?' <span class="tag" style="color:var(--sandy);font-size:11px;font-weight:600">retired</span>':''}<span class="pmeta">${esc(f.id)}</span></span>
+        <span class="pfeatcount"><b>${f.prods.length}</b> ${f.prods.length===1?'product':'products'}</span>
+      </button>
+      <div class="features">${list}</div>
+    </div>`;
+  }).join('');
+  $list.innerHTML=html||'<div class="empty">No features match that search.</div>';
+  $count.textContent=shown+' of '+feats.length+' features';
+  $list.querySelectorAll('.phead').forEach(b=>b.addEventListener('click',()=>{
+    const pr=b.parentElement;b.setAttribute('aria-expanded',pr.classList.toggle('open'));}));
+}
+
+function renderProducts(){
+  const m=compile($q.value);
+  const showAll=$all.checked, showIds=$ids.checked;
+  let shown=0;
+  const html=products.map(p=>{
+    if(!showAll && !p.headline && m.empty) return '';  // a search spans all products
+    const pMatch = m.empty || m.test(p.name) || m.test(p.sku) || m.test(p.guid);
+    const matchFeats = m.empty ? [] : p.feats.filter(f=>m.test(f.name)||m.test(f.id));
+    if(!m.empty && !pMatch && matchFeats.length===0) return '';
+    shown++;
+    // when searching by feature, show only matching feats and auto-open
+    const feats = (!m.empty && !pMatch) ? matchFeats : p.feats;
+    const open = (p.name===jumpProduct) || (!m.empty && (matchFeats.length>0 || (!pMatch)));
+    const featHtml = feats.map(f=>
+      `<div class="feat${f.retired?' retired':''}">
+        <span class="fname"><button class="feat-link" data-name="${escA(f.name)}" title="Show all products with this feature">${hl(f.name,m)}</button>${f.retired?' <span class="tag">retired</span>':''}</span>
+        <span class="fid">${esc(f.id)}</span>
+      </div>`).join('');
+    return `<div class="product${open?' open':''}${showIds?' show-ids':''}">
+      <button class="phead" aria-expanded="${open}">
+        <svg class="chev"><use href="#chev"/></svg>
+        <span class="pname">${hl(p.name,m)}<span class="pmeta">${esc(p.sku)} · ${esc(p.guid)}</span></span>
+        <span class="pfeatcount"><b>${p.feats.length}</b> ${p.feats.length===1?'feature':'features'}</span>
+      </button>
+      <div class="features">${featHtml}</div>
+    </div>`;
+  }).join('');
+  $list.innerHTML = html || '<div class="empty">No products match that search.</div>';
+  $count.textContent = shown+(showAll?' of '+products.length:'')+' products';
+  $list.querySelectorAll('.phead').forEach(b=>b.addEventListener('click',()=>{
+    const pr=b.parentElement; const o=pr.classList.toggle('open');
+    b.setAttribute('aria-expanded',o);
+  }));
+  jumpProduct=null;  // one-shot
+}
+</script>
