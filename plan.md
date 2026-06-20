@@ -92,11 +92,11 @@ Workflow needs `permissions: contents: write`. Pages is enabled once via repo se
 - The default SKU filter (which `String_Id` patterns count as "headline"). One assert-based check over a handful of known SKU codes so a pattern change that drops Business Standard fails loudly.
 - The GUID-strip-but-keep-searchable transform. One check that a known "Name (guid)" string renders clean and still matches a GUID search.
 
-## Resolved decisions
+## Open questions for review
 
-1. **Default SKU filter:** pattern-based on `String_Id`, confirmed. No hand-curated list.
-2. **Retired plans:** shown, not hidden, with a colour marker. Rendered in a muted/dimmed tone so they read as inactive without a status pill. This sits in the WCAG "inactive/incidental" allowance, and uses tone within the palette rather than borrowing an unrelated semantic hue.
-3. **SKU `String_Id` / GUID on the product row:** offered via a toggle. Off by default for a clean headline view, on to expose codes inline.
+1. Default SKU filter: confirm pattern-based is acceptable over a hand-curated list. Yes
+2. Should retired plans be hidden by default, or shown with a "retired" text marker? retired colour marker
+3. Any need to show the SKU `String_Id` / GUID on the product row itself, or only on demand? give the option
 
 ## Explicitly skipped (YAGNI)
 
